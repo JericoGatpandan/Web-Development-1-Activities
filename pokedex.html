@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial,
+          sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background-color: #f5f5f5;
+      }
+
+      img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      /* Header */
+      header {
+        background-color: rgb(255, 255, 255);
+        color: rgb(0, 0, 0);
+        padding: 1.5rem 2rem;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        text-align: center;
+        /* text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); */
+      }
+
+      /* Main Container using Flexbox */
+      main.main-container {
+        display: flex;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+        gap: 2rem;
+        align-items: flex-start;
+      }
+
+      /* Navigation Filters */
+      nav.filters {
+        flex: 0 0 280px;
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 120px;
+        height: fit-content;
+      }
+
+      /* Pokemon Grid Section */
+      section.pokemon-grid {
+        flex: 1;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+      }
+
+      /* Pokemon Card Articles */
+      article.card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        /* POSITION PROPERTY EXAMPLE */
+        position: relative;
+      }
+
+      article.card:hover {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      }
+
+      article.card a {
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        padding: 1.5rem;
+      }
+
+      article.card::before {
+        content: attr(class);
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 0.3rem 0.6rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        float: right;
+        z-index: 10;
+      }
+
+      /* Footer */
+      footer {
+        background: #333;
+        color: white;
+        text-align: center;
+        padding: 2rem;
+        margin-top: 3rem;
+      }
+
+      /* Filter Styling*/
+      .filters h3 {
+        margin: 0 0 1rem;
+        font-size: 1.2rem;
+        color: #333;
+        border-bottom: 2px solid #667eea;
+        padding-bottom: 0.5rem;
+      }
+
+      .filters .group {
+        margin-bottom: 2rem;
+      }
+
+      .filters input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .filters label {
+        display: inline-block;
+        padding: 0.7rem 1rem;
+        margin: 0.3rem 0.3rem 0 0;
+        border: 2px solid #ddd;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        background: #f8f9fa;
+        color: #333;
+        user-select: none;
+        transition: all 0.3s ease;
+      }
+
+      .filters label:hover {
+        border-color: #667eea;
+        background: #e7ebf3;
+      }
+
+      .filters input[type="radio"]:checked + label {
+        background: #667eea;
+        border-color: #667eea;
+        color: white;
+      }
+
+      /* Card Styling*/
+      .pokemon-name {
+        font-size: 1.5rem;
+        margin: 1rem 0 0.5rem;
+        color: #333;
+      }
+
+      .card-details {
+        font-size: 0.95rem;
+        color: #666;
+        line-height: 1.5;
+      }
+
+      .card img {
+        width: 100%;
+        height: 200px;
+        object-fit: contain;
+        background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+        border-radius: 8px;
+        margin-bottom: 1rem;
+      }
+
+      /* Filtering System*/
+      input[type="radio"][id^="f-"] {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      /* Type filters */
+      #f-type-fire:checked ~ main .card:not(.type-fire) {
+        display: none;
+      }
+      #f-type-water:checked ~ main .card:not(.type-water) {
+        display: none;
+      }
+      #f-type-earth:checked ~ main .card:not(.type-earth) {
+        display: none;
+      }
+      #f-type-grass:checked ~ main .card:not(.type-grass) {
+        display: none;
+      }
+      #f-type-electric:checked ~ main .card:not(.type-electric) {
+        display: none;
+      }
+      #f-type-psychic:checked ~ main .card:not(.type-psychic) {
+        display: none;
+      }
+
+      /* Category filters */
+      #f-cat-offense:checked ~ main .card:not(.cat-offense) {
+        display: none;
+      }
+      #f-cat-defense:checked ~ main .card:not(.cat-defense) {
+        display: none;
+      }
+
+      /* Detail Panel Styling */
+      .detail-panel {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 0;
+        height: 100vh;
+        overflow: hidden;
+        background: white;
+        border-left: 1px solid rgba(0, 0, 0, 0.1);
+        transition: width 0.3s ease, box-shadow 0.3s ease;
+        z-index: 1001;
+      }
+
+      .detail-panel:target {
+        width: 400px;
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .detail-panel .content {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        padding: 2rem;
+      }
+
+      .detail-panel:target .content {
+        opacity: 1;
+      }
+
+      .detail-panel .close {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        text-decoration: none;
+        font-size: 24px;
+        color: #333;
+        padding: 0.5rem;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8f9fa;
+        transition: all 0.3s ease;
+      }
+
+      .detail-panel .close:hover {
+        background: #dc3545;
+        color: white;
+      }
+
+      .muted {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        header h1 {
+          font-size: 2rem;
+        }
+
+        main.main-container {
+          flex-direction: column;
+          padding: 1rem;
+          gap: 1rem;
+        }
+
+        nav.filters {
+          flex: none;
+          position: static;
+          order: -1;
+        }
+
+        section.pokemon-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .detail-panel:target {
+          width: 100vw;
+        }
+
+        article.card::before {
+          display: none;
+        }
+      }
+
+      /* Tablet Styles (769px - 1024px) */
+      @media (min-width: 769px) and (max-width: 1024px) {
+        header h1 {
+          font-size: 2.2rem;
+        }
+
+        main.main-container {
+          padding: 1.5rem;
+        }
+
+        nav.filters {
+          flex: 0 0 250px;
+        }
+
+        section.pokemon-grid {
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+
+        .detail-panel:target {
+          width: 350px;
+        }
+      }
+
+      /* Desktop Styles (1025px and up) */
+      @media (min-width: 1025px) {
+        header h1 {
+          font-size: 2.5rem;
+        }
+
+        main.main-container {
+          padding: 2rem;
+        }
+
+        section.pokemon-grid {
+          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        }
+      }
+
+      /* Large Desktop Styles (1400px and up) */
+      @media (min-width: 1400px) {
+        section.pokemon-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+
+      article.card a {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+
+      article.card .card-details {
+        flex-grow: 1;
+        margin-top: auto;
+      }
+
+      nav.filters::after {
+        content: "Total: 20 Pokemon";
+        float: right;
+        background: #28a745;
+        color: white;
+        padding: 0.3rem 0.6rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        margin-top: 1rem;
+      }
+
+      body::after {
+        content: "↑";
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: #667eea;
+        color: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        cursor: pointer;
+        z-index: 1000;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Dito niyo ilagay styling (Note: wag galawin si nasa taas, color) */
+
+
+
+    </style>
+    <title>Document</title>
+  </head>
+
+  <body>
+    <header>
+      <h1 style="font-family: sans-serif; margin-top: 20px; margin-left: 20px">
+        Pokemon Pokedex
+      </h1>
+    </header>
+
+    <!-- Filter Inputs (moved outside main for CSS filtering to work) -->
+    <input type="radio" id="f-type-all" name="type" checked />
+    <input type="radio" id="f-type-fire" name="type" />
+    <input type="radio" id="f-type-water" name="type" />
+    <input type="radio" id="f-type-earth" name="type" />
+    <input type="radio" id="f-type-grass" name="type" />
+    <input type="radio" id="f-type-electric" name="type" />
+    <input type="radio" id="f-type-psychic" name="type" />
+    <input type="radio" id="f-cat-all" name="category" checked />
+    <input type="radio" id="f-cat-offense" name="category" />
+    <input type="radio" id="f-cat-defense" name="category" />
+
+    <main class="main-container">
+      <nav class="filters" aria-label="Filters">
+        <div class="group">
+          <h3>Type</h3>
+          <label for="f-type-all">All</label>
+          <label for="f-type-fire">Fire</label>
+          <label for="f-type-water">Water</label>
+          <label for="f-type-earth">Earth</label>
+          <label for="f-type-grass">Grass</label>
+          <label for="f-type-electric">Electric</label>
+          <label for="f-type-psychic">Psychic</label>
+        </div>
+        <div class="group">
+          <h3>Category</h3>
+          <label for="f-cat-all">All</label>
+          <label for="f-cat-offense">Offense</label>
+          <label for="f-cat-defense">Defense</label>
+        </div>
+      </nav>
+      <!--
+        <nav>
+            <li>All</li>
+            <li>Type</li>
+            <li>Category</li>
+        </nav> -->
+
+      <!-- <nav>
+            <ul>
+                <li><a class="active" href="#all" style="font-family: Arial;">All</a></li>
+                <li><a href="#type" style="font-family: Arial;">Type</a></li>
+                <li><a href="#Category" style="font-family: Arial;">Category</a></li>
+            </ul>
+        </nav> -->
+      <!-- <nav class="navbar">
+            <a href="#all">All</a>
+            <div class="dropdown">
+                <a href="#type">Type</a>
+                <div class="dropdown-menu">
+                    <a href="#fire">Fire</a>
+                    <a href="#earth">Earth</a>
+                    <a href="#water">Water</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <a href="#type">Category</a>
+                <div class="dropdown-menu">
+                    <a href="#fire">Fire</a>
+                    <a href="#earth">Earth</a>
+                    <a href="#water">Water</a>
+                </div>
+            </div>
+        </nav> -->
+
+      <section class="pokemon-grid">
+        <!-- Water Type Pokemon -->
+        <article class="card type-water cat-offense">
+          <a href="#detail-1">
+            <img
+              src="https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/025.png"
+              alt="Pikachu"
+            />
+            <h2 class="pokemon-name">Pikachu</h2>
+            <p>Type: Water</p>
+            <h3>Description</h3>
+            <p class="card-details">
+              When several of these Pokémon gather, their electricity could
+              build and cause lightning storms.
+            </p>
+          </a>
+        </article>
+
+        <article class="card type-water cat-defense">
+          <a href="#detail-2">
+            <img
+              src="https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/025.png"
+              alt="Pikachu"
+            />
+            <h2 class="pokemon-name">Pikachu</h2>
+            <p>Type: Water</p>
+            <h3>Description</h3>
+            <p class="card-details">
+              When several of these Pokémon gather, their electricity could
+              build and cause lightning storms.
+            </p>
+          </a>
+        </article>
+
+        <article class="card type-water cat-defense">
+          <a href="#detail-3">
+            <img
+              src="https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/025.png"
+              alt="Pikachu"
+            />
+            <h2 class="pokemon-name">Pikachu</h2>
+            <p>Type: Water</p>
+            <h3>Description</h3>
+            <p class="card-details">
+              When several of these Pokémon gather, their electricity could
+              build and cause lightning storms.
+            </p>
+          </a>
+        </article>
+
+        <!-- Fire Type Pokemon -->
+        <article class="card type-fire cat-offense">
+          <a href="#detail-4">
+            <img
+              src="https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/025.png"
+              alt="Pikachu"
+            />
+            <h2 class="pokemon-name">Pikachu</h2>
+            <p>Type: Fire</p>
+            <h3>Description</h3>
+            <p class="card-details">
+              When several of these Pokémon gather, their electricity could
+              build and cause lightning storms.
+            </p>
+          </a>
+        </article>
+
+        <article class="card type-fire cat-offense">
+          <a href="#detail-5">
+            <img
+              src="https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/025.png"
+              alt="Pikachu"
+            />
+            <h2 class="pokemon-name">Pikachu</h2>
+            <p>Type: Fire</p>
+            <h3>Description</h3>
+            <p class="card-details">
+              When several of these Pokémon gather, their electricity could
+              build and cause lightning storms.
+            </p>
+          </a>
+        </article>
+
+        <article class="card type-fire cat-defense">
+          <a href="#detail-6">
+            <img
+              src="https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/025.png"
+              alt="Pikachu"
+            />
+            <h2 class="pokemon-name">Pikachu</h2>
+            <p>Type: Fire</p>
+            <h3>Description</h3>
+            <p class="card-details">
+              When several of these Pokémon gather, their electricity could
+              build and cause lightning storms.
+            </p>
+          </a>
+        </article>
+
+        <!-- Grass Type Pokemon -->
+        <article class="card type-grass cat-defense">
+          <a href="#detail-7">
+            <img
+              src="https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/025.png"
+              alt="Pikachu"
+            />
+            <h2 class="pokemon-name">Pikachu</h2>
+            <p>Type: Grass</p>
+            <h3>Description</h3>
+            <p class="card-details">
+              When several of these Pokémon gather, their electricity could
+              build and cause lightning storms.
+            </p>
+          </a>
+        </article>
+
+        <article class="card type-grass cat-defense">
+          <a href="#detail-8">
+            <img
+              src="https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/025.png"
+              alt="Pikachu"
+            />
+            <h2 class="pokemon-name">Pikachu</h2>
+            <p>Type: Grass</p>
+            <h3>Description</h3>
+            <p class="card-details">
+              When several of these Pokémon gather, their electricity could
+              build and cause lightning storms.
+            </p>
+          </a>
+        </article>
+
+        <!-- Electric Type Pokemon -->
+        <article class="card type-electric cat-offense">
+          <a href="#detail-9">
+            <img
+              src="https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/025.png"
+              alt="Pikachu"
+            />
+            <h2 class="pokemon-name">Pikachu</h2>
+            <p>Type: Electric</p>
+            <h3>Description</h3>
+            <p class="card-details">
+              When several of these Pokémon gather, their electricity could
+              build and cause lightning storms.
+            </p>
+          </a>
+        </article>
+
+        <article class="card type-electric cat-offense">
+          <a href="#detail-10">
+            <img
+              src="https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/025.png"
+              alt="Pikachu"
+            />
+            <h2 class="pokemon-name">Pikachu</h2>
+            <p>Type: Electric</p>
+            <h3>Description</h3>
+            <p class="card-details">
+              When several of these Pokémon gather, their electricity could
+              build and cause lightning storms.
+            </p>
+          </a>
+        </article>
+
+        <!-- Psychic Type Pokemon -->
+        <article class="card type-psychic cat-offense">
+          <a href="#detail-11">
+            <img
+              src="https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/025.png"
+              alt="Pikachu"
+            />
+            <h2 class="pokemon-name">Pikachu</h2>
+            <p>Type: Psychic</p>
+            <h3>Description</h3>
+            <p class="card-details">
+              When several of these Pokémon gather, their electricity could
+              build and cause lightning storms.
+            </p>
+          </a>
+        </article>
+
+        <article class="card type-psychic cat-defense">
+          <a href="#detail-12">
+            <img
+              src="https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/025.png"
+              alt="Pikachu"
+            />
+            <h2 class="pokemon-name">Pikachu</h2>
+            <p>Type: Psychic</p>
+            <h3>Description</h3>
+            <p class="card-details">
+              When several of these Pokémon gather, their electricity could
+              build and cause lightning storms.
+            </p>
+          </a>
+        </article>
+
+        <!-- Earth Type Pokemon -->
+        <article class="card type-earth cat-defense">
+          <a href="#detail-13">
+            <img
+              src="https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/025.png"
+              alt="Pikachu"
+            />
+            <h2 class="pokemon-name">Pikachu</h2>
+            <p>Type: Earth</p>
+            <h3>Description</h3>
+            <p class="card-details">
+              When several of these Pokémon gather, their electricity could
+              build and cause lightning storms.
+            </p>
+          </a>
+        </article>
+
+        <article class="card type-earth cat-offense">
+          <a href="#detail-14">
+            <img
+              src="https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/025.png"
+              alt="Pikachu"
+            />
+            <h2 class="pokemon-name">Pikachu</h2>
+            <p>Type: Earth</p>
+            <h3>Description</h3>
+            <p class="card-details">
+              When several of these Pokémon gather, their electricity could
+              build and cause lightning storms.
+            </p>
+          </a>
+        </article>
+
+        <article class="card type-fire cat-defense">
+          <a href="#detail-15">
+            <img
+              src="https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/025.png"
+              alt="Pikachu"
+            />
+            <h2 class="pokemon-name">Pikachu</h2>
+            <p>Type: Fire</p>
+            <h3>Description</h3>
+            <p class="card-details">
+              When several of these Pokémon gather, their electricity could
+              build and cause lightning storms.
+            </p>
+          </a>
+        </article>
+
+        <article class="card type-water cat-offense">
+          <a href="#detail-16">
+            <img
+              src="https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/025.png"
+              alt="Pikachu"
+            />
+            <h2 class="pokemon-name">Pikachu</h2>
+            <p>Type: Water</p>
+            <h3>Description</h3>
+            <p class="card-details">
+              When several of these Pokémon gather, their electricity could
+              build and cause lightning storms.
+            </p>
+          </a>
+        </article>
+
+        <article class="card type-grass cat-offense">
+          <a href="#detail-17">
+            <img
+              src="https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/025.png"
+              alt="Pikachu"
+            />
+            <h2 class="pokemon-name">Pikachu</h2>
+            <p>Type: Grass</p>
+            <h3>Description</h3>
+            <p class="card-details">
+              When several of these Pokémon gather, their electricity could
+              build and cause lightning storms.
+            </p>
+          </a>
+        </article>
+
+        <article class="card type-electric cat-defense">
+          <a href="#detail-18">
+            <img
+              src="https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/025.png"
+              alt="Pikachu"
+            />
+            <h2 class="pokemon-name">Pikachu</h2>
+            <p>Type: Electric</p>
+            <h3>Description</h3>
+            <p class="card-details">
+              When several of these Pokémon gather, their electricity could
+              build and cause lightning storms.
+            </p>
+          </a>
+        </article>
+
+        <article class="card type-psychic cat-offense">
+          <a href="#detail-19">
+            <img
+              src="https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/025.png"
+              alt="Pikachu"
+            />
+            <h2 class="pokemon-name">Pikachu</h2>
+            <p>Type: Psychic</p>
+            <h3>Description</h3>
+            <p class="card-details">
+              When several of these Pokémon gather, their electricity could
+              build and cause lightning storms.
+            </p>
+          </a>
+        </article>
+
+        <article class="card type-earth cat-offense">
+          <a href="#detail-20">
+            <img
+              src="https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/025.png"
+              alt="Pikachu"
+            />
+            <h2 class="pokemon-name">Pikachu</h2>
+            <p>Type: Earth</p>
+            <h3>Description</h3>
+            <p class="card-details">
+              When several of these Pokémon gather, their electricity could
+              build and cause lightning storms.
+            </p>
+          </a>
+        </article>
+      </section>
+    </main>
+
+    <!-- Right-side detail panels (one per card) -->
+    <aside id="detail-1" class="detail-panel">
+      <a class="close" href="#" aria-label="Close">×</a>
+      <div class="content">
+        <h2>Pikachu</h2>
+        <p class="muted">Type: Water · Category: Offense</p>
+        <p>
+          When several of these Pokémon gather, their electricity could build
+          and cause lightning storms.
+        </p>
+      </div>
+    </aside>
+    <aside id="detail-2" class="detail-panel">
+      <a class="close" href="#" aria-label="Close">×</a>
+      <div class="content">
+        <h2>Pikachu</h2>
+        <p class="muted">Type: Water · Category: Defense</p>
+        <p>
+          When several of these Pokémon gather, their electricity could build
+          and cause lightning storms.
+        </p>
+      </div>
+    </aside>
+    <aside id="detail-3" class="detail-panel">
+      <a class="close" href="#" aria-label="Close">×</a>
+      <div class="content">
+        <h2>Pikachu</h2>
+        <p class="muted">Type: Water · Category: Defense</p>
+        <p>
+          When several of these Pokémon gather, their electricity could build
+          and cause lightning storms.
+        </p>
+      </div>
+    </aside>
+    <aside id="detail-4" class="detail-panel">
+      <a class="close" href="#" aria-label="Close">×</a>
+      <div class="content">
+        <h2>Pikachu</h2>
+        <p class="muted">Type: Fire · Category: Offense</p>
+        <p>
+          When several of these Pokémon gather, their electricity could build
+          and cause lightning storms.
+        </p>
+      </div>
+    </aside>
+    <aside id="detail-5" class="detail-panel">
+      <a class="close" href="#" aria-label="Close">×</a>
+      <div class="content">
+        <h2>Pikachu</h2>
+        <p class="muted">Type: Fire · Category: Offense</p>
+        <p>
+          When several of these Pokémon gather, their electricity could build
+          and cause lightning storms.
+        </p>
+      </div>
+    </aside>
+    <aside id="detail-6" class="detail-panel">
+      <a class="close" href="#" aria-label="Close">×</a>
+      <div class="content">
+        <h2>Pikachu</h2>
+        <p class="muted">Type: Fire · Category: Defense</p>
+        <p>
+          When several of these Pokémon gather, their electricity could build
+          and cause lightning storms.
+        </p>
+      </div>
+    </aside>
+    <aside id="detail-7" class="detail-panel">
+      <a class="close" href="#" aria-label="Close">×</a>
+      <div class="content">
+        <h2>Pikachu</h2>
+        <p class="muted">Type: Grass · Category: Defense</p>
+        <p>
+          When several of these Pokémon gather, their electricity could build
+          and cause lightning storms.
+        </p>
+      </div>
+    </aside>
+    <aside id="detail-8" class="detail-panel">
+      <a class="close" href="#" aria-label="Close">×</a>
+      <div class="content">
+        <h2>Pikachu</h2>
+        <p class="muted">Type: Grass · Category: Defense</p>
+        <p>
+          When several of these Pokémon gather, their electricity could build
+          and cause lightning storms.
+        </p>
+      </div>
+    </aside>
+    <aside id="detail-9" class="detail-panel">
+      <a class="close" href="#" aria-label="Close">×</a>
+      <div class="content">
+        <h2>Pikachu</h2>
+        <p class="muted">Type: Electric · Category: Offense</p>
+        <p>
+          When several of these Pokémon gather, their electricity could build
+          and cause lightning storms.
+        </p>
+      </div>
+    </aside>
+    <aside id="detail-10" class="detail-panel">
+      <a class="close" href="#" aria-label="Close">×</a>
+      <div class="content">
+        <h2>Pikachu</h2>
+        <p class="muted">Type: Electric · Category: Offense</p>
+        <p>
+          When several of these Pokémon gather, their electricity could build
+          and cause lightning storms.
+        </p>
+      </div>
+    </aside>
+    <aside id="detail-11" class="detail-panel">
+      <a class="close" href="#" aria-label="Close">×</a>
+      <div class="content">
+        <h2>Pikachu</h2>
+        <p class="muted">Type: Psychic · Category: Offense</p>
+        <p>
+          When several of these Pokémon gather, their electricity could build
+          and cause lightning storms.
+        </p>
+      </div>
+    </aside>
+    <aside id="detail-12" class="detail-panel">
+      <a class="close" href="#" aria-label="Close">×</a>
+      <div class="content">
+        <h2>Pikachu</h2>
+        <p class="muted">Type: Psychic · Category: Defense</p>
+        <p>
+          When several of these Pokémon gather, their electricity could build
+          and cause lightning storms.
+        </p>
+      </div>
+    </aside>
+    <aside id="detail-13" class="detail-panel">
+      <a class="close" href="#" aria-label="Close">×</a>
+      <div class="content">
+        <h2>Pikachu</h2>
+        <p class="muted">Type: Earth · Category: Defense</p>
+        <p>
+          When several of these Pokémon gather, their electricity could build
+          and cause lightning storms.
+        </p>
+      </div>
+    </aside>
+    <aside id="detail-14" class="detail-panel">
+      <a class="close" href="#" aria-label="Close">×</a>
+      <div class="content">
+        <h2>Pikachu</h2>
+        <p class="muted">Type: Earth · Category: Offense</p>
+        <p>
+          When several of these Pokémon gather, their electricity could build
+          and cause lightning storms.
+        </p>
+      </div>
+    </aside>
+
+    <aside id="detail-15" class="detail-panel">
+      <a class="close" href="#" aria-label="Close">×</a>
+      <div class="content">
+        <h2>Pikachu</h2>
+        <p class="muted">Type: Fire · Category: Defense</p>
+        <p>
+          When several of these Pokémon gather, their electricity could build
+          and cause lightning storms.
+        </p>
+      </div>
+    </aside>
+
+    <aside id="detail-16" class="detail-panel">
+      <a class="close" href="#" aria-label="Close">×</a>
+      <div class="content">
+        <h2>Pikachu</h2>
+        <p class="muted">Type: Water · Category: Offense</p>
+        <p>
+          When several of these Pokémon gather, their electricity could build
+          and cause lightning storms.
+        </p>
+      </div>
+    </aside>
+
+    <aside id="detail-17" class="detail-panel">
+      <a class="close" href="#" aria-label="Close">×</a>
+      <div class="content">
+        <h2>Pikachu</h2>
+        <p class="muted">Type: Grass · Category: Offense</p>
+        <p>
+          When several of these Pokémon gather, their electricity could build
+          and cause lightning storms.
+        </p>
+      </div>
+    </aside>
+
+    <aside id="detail-18" class="detail-panel">
+      <a class="close" href="#" aria-label="Close">×</a>
+      <div class="content">
+        <h2>Pikachu</h2>
+        <p class="muted">Type: Electric · Category: Defense</p>
+        <p>
+          When several of these Pokémon gather, their electricity could build
+          and cause lightning storms.
+        </p>
+      </div>
+    </aside>
+
+    <aside id="detail-19" class="detail-panel">
+      <a class="close" href="#" aria-label="Close">×</a>
+      <div class="content">
+        <h2>Pikachu</h2>
+        <p class="muted">Type: Psychic · Category: Offense</p>
+        <p>
+          When several of these Pokémon gather, their electricity could build
+          and cause lightning storms.
+        </p>
+      </div>
+    </aside>
+
+    <aside id="detail-20" class="detail-panel">
+      <a class="close" href="#" aria-label="Close">×</a>
+      <div class="content">
+        <h2>Pikachu</h2>
+        <p class="muted">Type: Earth · Category: Offense</p>
+        <p>
+          When several of these Pokémon gather, their electricity could build
+          and cause lightning storms.
+        </p>
+      </div>
+    </aside>
+
+    <footer>
+      <p>
+        &copy; 2025 Pokemon Pokedex - HTML Semantics & Responsive Design Project
+      </p>
+      <p>Created by: JustTheThreeOfUs Group</p>
+    </footer>
+  </body>
+</html>
